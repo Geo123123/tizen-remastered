@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Tizen Remastered",
+        "description": "Connect a Samsung Tizen TV over the local network.",
+        "data": {
+          "host": "Host",
+          "name": "Name",
+          "port": "WebSocket port",
+          "timeout": "Timeout",
+          "ws_name": "WebSocket client name",
+          "mac": "MAC address"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the TV"
+    },
+    "abort": {
+      "already_configured": "This TV is already configured"
+    }
+  }
+}

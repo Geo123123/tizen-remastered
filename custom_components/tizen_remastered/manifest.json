@@ -1,0 +1,14 @@
+{
+  "domain": "tizen_remastered",
+  "name": "Tizen Remastered",
+  "codeowners": ["@Geo123123"],
+  "config_flow": true,
+  "documentation": "https://github.com/Geo123123/samsungtv-tizen",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "requirements": [
+    "websocket-client>=1.8.0",
+    "wakeonlan>=3.1.0"
+  ],
+  "version": "0.1.0"
+}
