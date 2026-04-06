@@ -19,6 +19,8 @@ from .const import (
 )
 from .coordinator import TizenRemasteredCoordinator
 
+APP_OFF = "Aus"
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -96,11 +98,16 @@ class TizenAppSelect(TizenBaseSelect):
         super().__init__(coordinator, entry)
         self._app_list = app_list
         self._attr_unique_id = f"{entry.entry_id}_app_select"
-        self._attr_options = list(app_list)
-        self._attr_current_option = self._attr_options[0]
+        self._attr_options = [APP_OFF, *list(app_list)]
+        self._attr_current_option = APP_OFF
 
     async def async_select_option(self, option: str) -> None:
         """Launch the selected TV app."""
+        if option == APP_OFF:
+            self._attr_current_option = APP_OFF
+            self.async_write_ha_state()
+            return
+
         await self.hass.async_add_executor_job(
             self.coordinator.client.launch_app,
             self._app_list[option],

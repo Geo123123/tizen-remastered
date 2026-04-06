@@ -99,13 +99,26 @@ class SamsungTizenClient:
             connection.close()
 
     def launch_app(self, app_id: str) -> None:
-        """Launch a TV application using the local REST API."""
-        url = f"http://{self._host}:8001/api/v2/applications/{app_id}"
+        """Launch a TV application using the websocket app launcher."""
+        connection = self._create_ws_connection()
+        payload = {
+            "method": "ms.channel.emit",
+            "params": {
+                "event": "ed.apps.launch",
+                "to": "host",
+                "data": {
+                    "appId": app_id,
+                    "action_type": "DEEP_LINK",
+                },
+            },
+        }
+
         try:
-            response = requests.post(url, timeout=self._timeout)
-            response.raise_for_status()
-        except requests.RequestException as err:
+            connection.send(json.dumps(payload))
+        except OSError as err:
             raise TizenRemasteredConnectionError(str(err)) from err
+        finally:
+            connection.close()
 
     def open_browser(self, url: str) -> None:
         """Open a URL in the TV browser."""

@@ -53,11 +53,3 @@ tizen_remastered:
     device_id: "DEINE_SMARTTHINGS_DEVICE_ID"
     app_list: '{"YouTube":"111299001912","Netflix":"11101200001"}'
 ```
-
-## Naechste sinnvolle Schritte
-
-- Token-Handling fuer Port `8002`
-- App-Erkennung und `source_list`
-- sauberer Power-Status
-- Wake-on-LAN robuster machen
-- Optionen-Flow fuer App-Listen und TV-spezifische Einstellungen
