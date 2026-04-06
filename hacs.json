@@ -1,0 +1,6 @@
+{
+  "name": "Tizen Remastered",
+  "domains": ["tizen_remastered"],
+  "homeassistant": "2025.1.0",
+  "render_readme": true
+}

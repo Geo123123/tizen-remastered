@@ -3,7 +3,7 @@
   "name": "Tizen Remastered",
   "codeowners": ["@Geo123123"],
   "config_flow": true,
-  "documentation": "https://github.com/Geo123123/samsungtv-tizen",
+  "documentation": "https://github.com/Geo123123/tizen-remastered",
   "integration_type": "device",
   "iot_class": "local_polling",
   "requirements": [
