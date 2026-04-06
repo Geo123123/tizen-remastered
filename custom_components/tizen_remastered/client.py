@@ -13,6 +13,8 @@ import requests
 import websocket
 from wakeonlan import send_magic_packet
 
+from .const import DEFAULT_WS_TIMEOUT
+
 
 class TizenRemasteredError(Exception):
     """Base error for the Tizen Remastered client."""
@@ -50,6 +52,7 @@ class SamsungTizenClient:
         self._timeout = timeout
         self._ws_name = ws_name
         self._mac = mac
+        self._token: str | None = None
 
     def get_status(self) -> TVStatus:
         """Fetch the current TV status over the local HTTP API."""
@@ -133,9 +136,10 @@ class SamsungTizenClient:
     def _create_ws_connection(self) -> websocket.WebSocket:
         encoded_name = base64.b64encode(self._ws_name.encode("utf-8")).decode("utf-8")
         if self._port == 8002:
+            token_query = f"&token={self._token}" if self._token else ""
             url = (
                 f"wss://{self._host}:{self._port}/api/v2/channels/"
-                f"samsung.remote.control?name={encoded_name}"
+                f"samsung.remote.control?name={encoded_name}{token_query}"
             )
             sslopt: dict[str, Any] = {"cert_reqs": ssl.CERT_NONE}
         else:
@@ -148,11 +152,23 @@ class SamsungTizenClient:
         try:
             connection = websocket.create_connection(
                 url,
-                timeout=self._timeout,
+                timeout=max(self._timeout, DEFAULT_WS_TIMEOUT),
                 sslopt=sslopt,
             )
-            connection.recv()
+            response = connection.recv()
+            self._store_token(response)
         except (OSError, socket.error, websocket.WebSocketException) as err:
             raise TizenRemasteredConnectionError(str(err)) from err
 
         return connection
+
+    def _store_token(self, response: str) -> None:
+        """Store the Samsung token if the TV provides one."""
+        try:
+            payload = json.loads(response)
+        except json.JSONDecodeError:
+            return
+
+        token = payload.get("data", {}).get("token")
+        if token:
+            self._token = str(token)
