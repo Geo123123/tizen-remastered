@@ -38,6 +38,22 @@ Damit in Home Assistant eine App-Auswahl erscheint, kann im Config-Flow eine JSO
 {"YouTube":"111299001912","Netflix":"11101200001","Prime Video":"3201512006785"}
 ```
 
+## configuration.yaml
+
+`api_key` und `device_id` koennen ueber die `configuration.yaml` vorgegeben werden. Beispiel:
+
+```yaml
+tizen_remastered:
+  - host: 192.168.178.69
+    name: Samsung TV Remastered
+    port: 8002
+    ws_name: Home Assistant
+    mac: "68:72:c3:60:dd:49"
+    api_key: "DEIN_SMARTTHINGS_API_KEY"
+    device_id: "DEINE_SMARTTHINGS_DEVICE_ID"
+    app_list: '{"YouTube":"111299001912","Netflix":"11101200001"}'
+```
+
 ## Naechste sinnvolle Schritte
 
 - Token-Handling fuer Port `8002`

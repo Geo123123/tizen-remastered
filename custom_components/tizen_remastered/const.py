@@ -7,7 +7,9 @@ from typing import Any
 
 DOMAIN = "tizen_remastered"
 
+CONF_API_KEY = "api_key"
 CONF_APP_LIST = "app_list"
+CONF_DEVICE_ID = "device_id"
 CONF_MAC = "mac"
 CONF_PORT = "port"
 CONF_WS_NAME = "ws_name"

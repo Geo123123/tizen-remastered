@@ -65,6 +65,16 @@ class TizenRemasteredConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
 
+    async def async_step_import(self, user_input: dict) -> FlowResult:
+        """Import a config entry from configuration.yaml."""
+        await self.async_set_unique_id(user_input[CONF_HOST])
+        self._abort_if_unique_id_configured(updates=user_input)
+
+        return self.async_create_entry(
+            title=user_input.get(CONF_NAME, DEFAULT_NAME),
+            data=user_input,
+        )
+
     async def _async_can_connect(self, user_input: dict) -> bool:
         """Validate the user input allows us to connect."""
         client = SamsungTizenClient(
