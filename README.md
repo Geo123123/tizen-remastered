@@ -10,6 +10,11 @@ Neue Home-Assistant-Custom-Integration fuer Samsung-Tizen-Fernseher.
 - Grundlegende Steuerung fuer:
   - Ein
   - Aus
+  - Lauter / Leiser
+  - Mute
+  - Play / Pause / Stop
+  - Kanal vor / zurueck
+  - Quellenwahl fuer TV und HDMI
   - Key senden ueber `media_player.play_media`
   - App starten
   - URL im Browser oeffnen
