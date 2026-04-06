@@ -44,7 +44,7 @@ class TizenRemasteredMediaPlayer(
     """Representation of a Samsung Tizen TV."""
 
     _attr_device_class = MediaPlayerDeviceClass.TV
-    _attr_has_entity_name = True
+    _attr_has_entity_name = False
     _attr_supported_features = (
         MediaPlayerEntityFeature.TURN_OFF
         | MediaPlayerEntityFeature.TURN_ON
@@ -64,7 +64,7 @@ class TizenRemasteredMediaPlayer(
         super().__init__(coordinator)
         self._entry = entry
         self._attr_unique_id = entry.entry_id
-        self._attr_name = entry.data.get(CONF_NAME, DEFAULT_NAME)
+        self._attr_name = entry.title or entry.data.get(CONF_NAME, DEFAULT_NAME)
         self._attr_is_volume_muted = False
         self._attr_source = None
         self._attr_source_list = list(DEFAULT_SOURCE_LIST)

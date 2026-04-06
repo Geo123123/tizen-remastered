@@ -60,7 +60,7 @@ class TizenSourceSelect(TizenBaseSelect):
     """Select TV inputs."""
 
     _attr_has_entity_name = True
-    _attr_name = "Source"
+    _attr_name = "TV Source"
 
     def __init__(self, coordinator: TizenRemasteredCoordinator, entry: ConfigEntry) -> None:
         """Initialize the source selector."""
@@ -84,7 +84,7 @@ class TizenAppSelect(TizenBaseSelect):
     """Select and launch configured TV apps."""
 
     _attr_has_entity_name = True
-    _attr_name = "App"
+    _attr_name = "TV App"
 
     def __init__(
         self,
