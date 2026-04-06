@@ -6,6 +6,8 @@ Neue Home-Assistant-Custom-Integration fuer Samsung-Tizen-Fernseher.
 
 - Moderne Config-Entry-Basis mit `config_flow`
 - `media_player`-Entity fuer den Fernseher
+- `select`-Entity fuer Quellen
+- optionale `select`-Entity fuer Apps
 - Lokaler Statuscheck ueber `http://<tv-ip>:8001/api/v2/`
 - Grundlegende Steuerung fuer:
   - Ein
@@ -26,6 +28,15 @@ Neue Home-Assistant-Custom-Integration fuer Samsung-Tizen-Fernseher.
 - `custom_components/tizen_remastered/coordinator.py`
 - `custom_components/tizen_remastered/client.py`
 - `custom_components/tizen_remastered/media_player.py`
+- `custom_components/tizen_remastered/select.py`
+
+## App-Liste
+
+Damit in Home Assistant eine App-Auswahl erscheint, kann im Config-Flow eine JSON-App-Liste hinterlegt werden, zum Beispiel:
+
+```json
+{"YouTube":"111299001912","Netflix":"11101200001","Prime Video":"3201512006785"}
+```
 
 ## Naechste sinnvolle Schritte
 

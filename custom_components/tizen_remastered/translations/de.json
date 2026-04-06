@@ -10,12 +10,14 @@
           "port": "WebSocket-Port",
           "timeout": "Timeout",
           "ws_name": "WebSocket-Clientname",
-          "mac": "MAC-Adresse"
+          "mac": "MAC-Adresse",
+          "app_list": "App-Liste (JSON)"
         }
       }
     },
     "error": {
-      "cannot_connect": "Verbindung zum Fernseher fehlgeschlagen"
+      "cannot_connect": "Verbindung zum Fernseher fehlgeschlagen",
+      "invalid_app_list": "Die App-Liste muss ein gueltiges JSON-Objekt sein"
     },
     "abort": {
       "already_configured": "Dieser Fernseher ist bereits eingerichtet"

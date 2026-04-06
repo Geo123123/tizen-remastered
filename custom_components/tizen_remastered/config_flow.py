@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -9,7 +11,18 @@ from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TIMEOUT
 from homeassistant.data_entry_flow import FlowResult
 
 from .client import SamsungTizenClient
-from .const import CONF_MAC, CONF_PORT, CONF_WS_NAME, DEFAULT_NAME, DEFAULT_PORT, DEFAULT_TIMEOUT, DEFAULT_WS_NAME, DOMAIN
+from .const import (
+    CONF_APP_LIST,
+    CONF_MAC,
+    CONF_PORT,
+    CONF_WS_NAME,
+    DEFAULT_NAME,
+    DEFAULT_PORT,
+    DEFAULT_TIMEOUT,
+    DEFAULT_WS_NAME,
+    DOMAIN,
+    parse_app_list,
+)
 
 
 class TizenRemasteredConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -22,16 +35,21 @@ class TizenRemasteredConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            await self.async_set_unique_id(user_input[CONF_HOST])
-            self._abort_if_unique_id_configured()
+            try:
+                parse_app_list(user_input.get(CONF_APP_LIST))
+            except (ValueError, json.JSONDecodeError):
+                errors["base"] = "invalid_app_list"
+            else:
+                await self.async_set_unique_id(user_input[CONF_HOST])
+                self._abort_if_unique_id_configured()
 
-            if await self._async_can_connect(user_input):
-                return self.async_create_entry(
-                    title=user_input.get(CONF_NAME, DEFAULT_NAME),
-                    data=user_input,
-                )
+                if await self._async_can_connect(user_input):
+                    return self.async_create_entry(
+                        title=user_input.get(CONF_NAME, DEFAULT_NAME),
+                        data=user_input,
+                    )
 
-            errors["base"] = "cannot_connect"
+                errors["base"] = "cannot_connect"
 
         schema = vol.Schema(
             {
@@ -41,6 +59,7 @@ class TizenRemasteredConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional(CONF_TIMEOUT, default=DEFAULT_TIMEOUT): vol.Coerce(float),
                 vol.Optional(CONF_WS_NAME, default=DEFAULT_WS_NAME): str,
                 vol.Optional(CONF_MAC): str,
+                vol.Optional(CONF_APP_LIST): str,
             }
         )
 

@@ -1,5 +1,10 @@
 """Constants for the Tizen Remastered integration."""
 
+from __future__ import annotations
+
+import json
+from typing import Any
+
 DOMAIN = "tizen_remastered"
 
 CONF_APP_LIST = "app_list"
@@ -22,3 +27,22 @@ DEFAULT_SOURCE_LIST: dict[str, str] = {
     "HDMI 3": "KEY_HDMI3",
     "HDMI 4": "KEY_HDMI4",
 }
+
+
+def parse_app_list(value: str | dict[str, str] | None) -> dict[str, str]:
+    """Parse an app list from config input."""
+    if value is None:
+        return {}
+
+    if isinstance(value, dict):
+        return {str(key): str(app_id) for key, app_id in value.items()}
+
+    value = value.strip()
+    if not value:
+        return {}
+
+    parsed: Any = json.loads(value)
+    if not isinstance(parsed, dict):
+        raise ValueError("App list must be a JSON object")
+
+    return {str(key): str(app_id) for key, app_id in parsed.items()}

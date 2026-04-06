@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from .const import DATA_COORDINATOR, DOMAIN
 from .coordinator import TizenRemasteredCoordinator
 
-PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER]
+PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER, Platform.SELECT]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

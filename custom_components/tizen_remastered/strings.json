@@ -10,12 +10,14 @@
           "port": "WebSocket port",
           "timeout": "Timeout",
           "ws_name": "WebSocket client name",
-          "mac": "MAC address"
+          "mac": "MAC address",
+          "app_list": "App list (JSON)"
         }
       }
     },
     "error": {
-      "cannot_connect": "Failed to connect to the TV"
+      "cannot_connect": "Failed to connect to the TV",
+      "invalid_app_list": "App list must be a valid JSON object"
     },
     "abort": {
       "already_configured": "This TV is already configured"
