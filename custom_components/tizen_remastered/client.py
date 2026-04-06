@@ -7,6 +7,7 @@ import json
 import socket
 import ssl
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import requests
@@ -46,13 +47,15 @@ class SamsungTizenClient:
         timeout: float,
         ws_name: str,
         mac: str | None = None,
+        token_path: str | None = None,
     ) -> None:
         self._host = host
         self._port = port
         self._timeout = timeout
         self._ws_name = ws_name
         self._mac = mac
-        self._token: str | None = None
+        self._token_path = Path(token_path) if token_path else None
+        self._token: str | None = self._load_token()
 
     def get_status(self) -> TVStatus:
         """Fetch the current TV status over the local HTTP API."""
@@ -134,6 +137,10 @@ class SamsungTizenClient:
         send_magic_packet(self._mac)
 
     def _create_ws_connection(self) -> websocket.WebSocket:
+        return self._create_ws_connection_inner(allow_token_reset=True)
+
+    def _create_ws_connection_inner(self, allow_token_reset: bool) -> websocket.WebSocket:
+        """Create a websocket connection and retry once without a stale token."""
         encoded_name = base64.b64encode(self._ws_name.encode("utf-8")).decode("utf-8")
         if self._port == 8002:
             token_query = f"&token={self._token}" if self._token else ""
@@ -158,6 +165,10 @@ class SamsungTizenClient:
             response = connection.recv()
             self._store_token(response)
         except (OSError, socket.error, websocket.WebSocketException) as err:
+            if allow_token_reset and self._token and self._port == 8002:
+                self._token = None
+                self._save_token()
+                return self._create_ws_connection_inner(allow_token_reset=False)
             raise TizenRemasteredConnectionError(str(err)) from err
 
         return connection
@@ -172,3 +183,27 @@ class SamsungTizenClient:
         token = payload.get("data", {}).get("token")
         if token:
             self._token = str(token)
+            self._save_token()
+
+    def _load_token(self) -> str | None:
+        """Load a cached Samsung token from disk."""
+        if not self._token_path or not self._token_path.exists():
+            return None
+
+        try:
+            token = self._token_path.read_text(encoding="utf-8").strip()
+        except OSError:
+            return None
+
+        return token or None
+
+    def _save_token(self) -> None:
+        """Persist the Samsung token to disk."""
+        if not self._token_path:
+            return
+
+        try:
+            self._token_path.parent.mkdir(parents=True, exist_ok=True)
+            self._token_path.write_text(self._token or "", encoding="utf-8")
+        except OSError:
+            return

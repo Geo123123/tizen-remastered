@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
+import re
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TIMEOUT
@@ -18,12 +19,14 @@ class TizenRemasteredCoordinator(DataUpdateCoordinator[TVStatus]):
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         self.entry = entry
+        safe_host = re.sub(r"[^a-zA-Z0-9_.-]", "_", entry.data[CONF_HOST])
         self.client = SamsungTizenClient(
             host=entry.data[CONF_HOST],
             port=entry.data.get(CONF_PORT, DEFAULT_PORT),
             timeout=entry.data.get(CONF_TIMEOUT, DEFAULT_TIMEOUT),
             ws_name=entry.data.get(CONF_WS_NAME, DEFAULT_WS_NAME),
             mac=entry.data.get(CONF_MAC),
+            token_path=hass.config.path(".storage", f"tizen_remastered_token_{safe_host}.txt"),
         )
 
         super().__init__(
