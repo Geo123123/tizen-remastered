@@ -6,6 +6,7 @@ import base64
 import json
 import socket
 import ssl
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -80,7 +81,6 @@ class SamsungTizenClient:
 
     def send_key(self, key: str) -> None:
         """Send a remote key to the TV."""
-        connection = self._create_ws_connection()
         payload = {
             "method": "ms.remote.control",
             "params": {
@@ -91,38 +91,44 @@ class SamsungTizenClient:
             },
         }
 
-        try:
-            connection.send(json.dumps(payload))
-        except OSError as err:
-            raise TizenRemasteredConnectionError(str(err)) from err
-        finally:
-            connection.close()
+        self._send_ws_payload(payload)
 
     def launch_app(self, app_id: str) -> None:
         """Launch a TV application using the websocket app launcher."""
-        connection = self._create_ws_connection()
-        payload = {
-            "method": "ms.channel.emit",
-            "params": {
-                "event": "ed.apps.launch",
-                "to": "host",
-                "data": {
-                    "appId": app_id,
-                    "action_type": "DEEP_LINK",
+        self._send_ws_payload(
+            {
+                "method": "ms.channel.emit",
+                "params": {
+                    "event": "ed.apps.launch",
+                    "to": "host",
+                    "data": {
+                        "appId": app_id,
+                        "action_type": "DEEP_LINK",
+                        "metaTag": "",
+                    },
                 },
             },
-        }
-
-        try:
-            connection.send(json.dumps(payload))
-        except OSError as err:
-            raise TizenRemasteredConnectionError(str(err)) from err
-        finally:
-            connection.close()
+            settle_delay=1.0,
+        )
+        # Some TVs/apps only react to NATIVE_LAUNCH.
+        self._send_ws_payload(
+            {
+                "method": "ms.channel.emit",
+                "params": {
+                    "event": "ed.apps.launch",
+                    "to": "host",
+                    "data": {
+                        "appId": app_id,
+                        "action_type": "NATIVE_LAUNCH",
+                        "metaTag": "",
+                    },
+                },
+            },
+            settle_delay=1.0,
+        )
 
     def open_browser(self, url: str) -> None:
         """Open a URL in the TV browser."""
-        connection = self._create_ws_connection()
         payload = {
             "method": "ms.channel.emit",
             "params": {
@@ -135,13 +141,7 @@ class SamsungTizenClient:
                 },
             },
         }
-
-        try:
-            connection.send(json.dumps(payload))
-        except OSError as err:
-            raise TizenRemasteredConnectionError(str(err)) from err
-        finally:
-            connection.close()
+        self._send_ws_payload(payload, settle_delay=1.0)
 
     def turn_on(self) -> None:
         """Turn on the TV with Wake-on-LAN if a MAC address is configured."""
@@ -197,6 +197,17 @@ class SamsungTizenClient:
         if token:
             self._token = str(token)
             self._save_token()
+
+    def _send_ws_payload(self, payload: dict[str, Any], settle_delay: float = 0.3) -> None:
+        """Send a websocket payload and keep the socket open briefly."""
+        connection = self._create_ws_connection()
+        try:
+            connection.send(json.dumps(payload))
+            time.sleep(settle_delay)
+        except OSError as err:
+            raise TizenRemasteredConnectionError(str(err)) from err
+        finally:
+            connection.close()
 
     def _load_token(self) -> str | None:
         """Load a cached Samsung token from disk."""
